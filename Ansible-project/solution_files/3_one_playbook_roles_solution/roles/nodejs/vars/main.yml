@@ -1,0 +1,5 @@
+---
+container_path: /home/ec2-user/nodejs
+container_name: nec_nodejs
+image_name: nec2005/nodejs
+# vars file for nodejs

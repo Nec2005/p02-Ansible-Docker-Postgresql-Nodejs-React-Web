@@ -1,7 +1,4 @@
 # p07- Web Page Application (Postgresql-Nodejs-React) deployed on EC2's with Ansible and Docker
- Web Page Application (Postgresql-Nodejs-React) deployed on EC2's with Ansible and Docker
-
-# Project-207 : Web Page Application (Postgresql-Nodejs-React) deployed on EC2's with Ansible and Docker
 
 ## Description
 

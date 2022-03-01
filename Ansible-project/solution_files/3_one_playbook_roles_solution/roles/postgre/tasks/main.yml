@@ -1,0 +1,47 @@
+---
+    - name: create build directory
+      file:
+        path: "{{ postgre_container }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+   
+    - name: copy sql script
+      copy:
+        src: init.sql
+        dest: "{{ postgre_container }}"
+    
+    - name: copy Dockerfile
+      copy:
+        src: Dockerfile
+        dest: "{{ postgre_container }}"
+
+    - name: remove {{ container_name }} container and nec2005/postgre if exists
+      shell: "docker ps -q --filter 'name={{ container_name }}' | grep -q . && docker stop {{ container_name }} && docker rm -fv {{ container_name }} && docker image rm -f {{ image_name }} || echo 'Not Found'"
+
+    - name: build container image
+      docker_image:
+        name: "{{ image_name }}"
+        build:
+          path: "{{ postgre_container }}"
+        state: present
+        source: build
+
+    - name: Launch docker container
+      docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        volumes:
+          - /db-data:/var/lib/postgresql/data
+        state: started
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_PASSWORD: "{{ password }}"
+      register: container_info
+    
+    - name: print container info
+      debug:
+        var: container_info
+# tasks file for postgre

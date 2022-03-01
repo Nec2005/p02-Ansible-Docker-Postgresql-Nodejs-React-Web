@@ -1,0 +1,6 @@
+---
+postgre_container: /home/ec2-user/postgresql
+container_name: nec_postgre
+image_name: nec2005/postgre
+# password: secret.yaml
+# vars file for postgre

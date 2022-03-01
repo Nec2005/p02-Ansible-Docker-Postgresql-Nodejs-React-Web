@@ -1,0 +1,6 @@
+--- 
+container_path: /home/ec2-user/react
+container_name: nec_react
+image_name: nec2005/react
+
+# vars file for react

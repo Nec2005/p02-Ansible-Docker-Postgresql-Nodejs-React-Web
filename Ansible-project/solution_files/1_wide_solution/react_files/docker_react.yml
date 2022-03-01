@@ -1,0 +1,101 @@
+---
+- name: configure react node
+  hosts: ansible_react
+  become: yes
+  tasks:
+    - name: upgrade all packages
+      yum:
+        name: "*"
+        state: latest
+    - name: Remove docker if installed from CentOS repo
+      yum:
+        name: 
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: removed
+    - name: Install yum utils
+      yum:
+        name: yum-utils
+        state: latest 
+
+    - name: Add Docker repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docer-ce.repo
+
+    - name: Install Docker
+      package:
+        name: docker-ce
+        state: latest
+    
+    - name: pip install
+      package:
+        name: python3-pip
+        state: present
+    
+    - name: Install docker-SDK
+      pip:
+        name: docker
+    
+    - name: Add user ec2-user to docker group
+      user:
+        name: ec2-user
+        group: docker
+        append: yes
+    
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+    
+    - name: create directory
+      file:
+        path: /home/ec2-user/react
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: copy server files
+      copy:
+        src: /home/ec2-user/Ansible-project/project_files/client/
+        dest: /home/ec2-user/react
+    
+    - name: copy Dockerfile
+      copy:
+        src: /home/ec2-user/Ansible-project/solution_files/1_wide_solution/react_files/Dockerfile
+        dest: /home/ec2-user/react
+
+    - name: remove nec_react container and nec2005/react if exists
+      shell: "docker ps -q --filter 'name=nec_react' | grep -q . && docker stop nec_react && docker rm -fv nec_react && docker image rm -f nec2005/react|| echo 'Not Found'"
+
+    - name: build container image
+      docker_image:
+        name: nec2005/react
+        build:
+          path: /home/ec2-user/react
+        state: present
+        source: build
+
+    - name: Launch docker container
+      docker_container:
+        name: nec_react
+        image: nec2005/react
+        state: started
+        ports:
+          - "3000:3000"
+      register: container_info
+    
+    - name: print container info
+      debug:
+        var: container_info
+
+
+      

@@ -1,0 +1,27 @@
+---
+- name: Docker install
+  hosts: development
+  become: true
+  roles:
+    - docker
+
+- name: Postgre confgure
+  hosts: ansible_postgrsql 
+  become: true
+  vars_files:
+    - secret.yaml
+  roles:
+    - postgre
+
+- name: nodejs confgure
+  hosts: ansible_nodejs 
+  become: true
+  roles:
+    - nodejs
+
+- name: react  confgure
+  hosts: ansible_react 
+  become: true
+  roles:
+    - react
+
